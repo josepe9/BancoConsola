@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -45,7 +46,8 @@ namespace BancoConsola
                         Console.WriteLine(" 3 - Transferencias");
                         Console.WriteLine(" 4 - Consulta Puntos ViveColombia");
                         Console.WriteLine(" 5 - Canjea tus Puntos ViveColombia");
-                        Console.WriteLine(" 6 - Salir");
+                        Console.WriteLine(" 6 - Generar movimientos Json ");
+                        Console.WriteLine(" 7 - Salir");
                         Console.WriteLine("--------INGRESE LA OPCION------------");
 
                         opcion =  Convert.ToInt32(Console.ReadLine());
@@ -56,13 +58,14 @@ namespace BancoConsola
                             case 3: Trasferir(); break;
                             case 4: Puntos(); break;
                             case 5: CanjePuntos(); break;
+                            case 6: GenerarJson(); break;
                         }
                     }
                     catch (Exception error)
                     {
                         Console.WriteLine("Digite valor valido" + error);
                     }
-                } while (opcion != 6);
+                } while (opcion != 7);
             }
         }
 
@@ -87,6 +90,7 @@ namespace BancoConsola
         public static void Retirar()
         {
             Console.WriteLine($"\nEl usuario tiene de saldo ${saldito.ToString("0,0.00", CultureInfo.InvariantCulture)}");
+
             Console.WriteLine("Digite el valor a retirar");
             decimal valorretiro = Convert.ToDecimal(Console.ReadLine());
             //se valida si el valor del retiro es hasta lo  permitido por el banco
@@ -250,7 +254,39 @@ namespace BancoConsola
             }
         }
 
+        public static void GenerarJson()
+        {
+            JsonWriter writer;
+            StreamWriter logFile = File.CreateText("bancolog.json");
+            logFile.AutoFlush = true;
+            writer = new JsonTextWriter(logFile);
+            writer.Formatting = Formatting.Indented;
+            writer.WriteStartObject();
+            writer.WritePropertyName("Usuarios");
+            writer.WriteStartArray();
 
+            foreach (Cuentas cuen in lista)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("Cedula");
+                writer.WriteValue(cuen.Cedula);
+                writer.WritePropertyName("Nombre");
+                writer.WriteValue(cuen.Nombre);
+                writer.WritePropertyName("Cuenta");
+                writer.WriteValue(cuen.Cuenta);
+                writer.WritePropertyName("Saldo");
+                writer.WriteValue(cuen.Saldo);
+                writer.WritePropertyName("Puntos");
+                writer.WriteValue(cuen.Puntos);
+                writer.WriteEndObject();
+            }
+            writer.WriteEndArray();
+            writer.WriteEndObject();
+            writer.Close();
+
+           // bancolog.Finish();
+
+        }
 
         public static string Ingresar()  //Metodo para consultar si el usuario existe, se consulta por cédula y password
         {
