@@ -4,3 +4,4 @@ Consultar su saldo
 Hacer retiros
 Hacer transferencias entre cuentas del mismo banco
 Consultar puntos y redimirlos
+Crear un archivo Json con los datos del model
